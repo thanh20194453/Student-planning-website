@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Title-->
+    <title>Admin homepage</title>
+    <!-- CSS File-->
+  </head>
+  <body style="background-color: skyblue">
+    <div id="container">
+      <table>
+        <tr>
+          <td><img src="https://ctt-sis.hust.edu.vn/Content/Images/logo-cttdt.png" alt=""></td>
+        </tr>
+      </table>
+    <!--Table-->
+    <table>
+      <tr>
+        <td id="headerlocation">
+          <button onclick="window.location.href='/home';">Home</button>
+          <button onclick="window.location.href='/admin/account';">Manage account</button>
+          <button onclick="window.location.href='/admin/course';">Manage course</button>
+          <button onclick="window.location.href='/admin/course-requirement';">Manage course requirement</button>
+          <button onclick="window.location.href='/admin/class';">Manage class</button>
+          <button onclick="window.location.href='/admin/registration';">Manage registration</button>
+          <button onclick="window.location.href='/admin/semester-class';">Manage semester class</button>
+          <button onclick="window.location.href='/logout';">Log out</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: white; color: red;"><CENTER>Quản lý học phần diều kiện</CENTER></td>
+      </tr>
+      <tr>
+        <td>
+          <table id="courseTable">
+            <thead>
+              <tr>
+                <th>Course ID</th>
+                <th>Required course ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <button onclick="addRequirement();">Add new requirement</button>
+          <button onclick="updateCourseRequirement();">Update course requirement</button>
+          <br>
+          <label id="statusLabel"></label>
+        </td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: rgb(0, 128, 58)">
+                        <div style="text-align: center">
+                            Trang admin phòng Đào tạo Đại học trường Đại học Bách Khoa Hà Nội
+                        </div>
+                        <p align="center" style="font-size: small; color: #800000" class="status_text">
+                            Hanoi University of Science and Technology - No. 1, Dai Co Viet Str., Hanoi, Vietnam
+                            <br>
+                            Tel: (+844)38682305, (+844)38692008 - E-mail: <a href="mailto:dt@hust.edu.vn" id="A2" class="custom">abc@mail.hust.edu.vn</a>
+                        </p>
+        </td>
+      </tr>
+    </table>
+    
+    <link rel='stylesheet' type='text/css' href='/style.css'/>
+    <style>
+      label[id='statusLabel']{
+          color: yellow;
+          font-size: x-large;
+          background-color: green;
+      }
+    </style>
+    <script>
+      function onDelete(td) {
+          let row = td.parentElement.parentElement;
+          row.parentNode.removeChild(row);
+      }
+
+      function addRequirement() {
+          document.getElementById("statusLabel").innerHTML = '';
+          let table = document.getElementById("courseTable").getElementsByTagName('tbody')[0];
+          let tableRow = table.insertRow(table.length);
+          let cell = tableRow.insertCell(0);
+          cell.innerHTML = '<input placeholder=\'Course ID\'></input>';
+          cell = tableRow.insertCell(1);
+          cell.innerHTML = '<input placeholder=\'Required course ID\'></input>';
+          cell = tableRow.insertCell(2);
+          cell.innerHTML = '<a onClick="onDelete(this)">Delete</a>';
+      }
+
+      function updateCourseRequirement() {
+          let table = document.getElementById("courseTable").getElementsByTagName('tbody')[0];
+          let data = [];
+          let flag=0;
+          for (let i = 0, row; row = table.rows[i]; i += 1) {
+              if (row.cells[0].childNodes[0].value == 0 || row.cells[1].childNodes[0].value == 0 ){
+                flag =1;
+              }
+              let e = []
+              for (let j = 0; j < 2; j += 1) {
+                  e.push(row.cells[j].childNodes[0].value);
+              }
+              data.push(e);
+          }
+          if (flag ==1){
+            document.getElementById("statusLabel").innerHTML = "Need to input all input place";
+          }else {
+            fetch('/admin/update/course-requirement', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+          .then(res => res.text())
+          .then(data => {
+                    document.getElementById("statusLabel").innerHTML = data;
+                });
+            }
+      }
+      
+      function getCourses() {
+          fetch('/admin/get/course-requirement')
+	      .then(res => res.json())
+	      .then(data => {
+                  let table = document.getElementById("courseTable").getElementsByTagName('tbody')[0];
+                  while (table.rows.length > 0) {
+		      table.deleteRow(table.rows.length - 1);
+	          }
+                  data.forEach(row => {
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = '<input placeholder=\'Course ID\'></input>';
+                      cell.childNodes[0].value = row.course_id;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = '<input placeholder=\'Required course ID\'></input>';
+                      cell.childNodes[0].value = row.require_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = '<a onClick="onDelete(this)">Delete</a>';
+	          });
+              });
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+          getCourses();
+      }, false);
+    </script>
+  </div>
+  </body>
+</html>

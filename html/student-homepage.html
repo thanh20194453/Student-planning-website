@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Title-->
+    <title>Student homepage</title>
+    <!-- CSS File-->
+  </head>
+  <body style="background-color: skyblue">
+    <div id="container">
+      <table>
+        <tr>
+          <td><img src="https://ctt-sis.hust.edu.vn/Content/Images/logo-cttdt.png" alt="" style="width: 1080px; height: 160px;"></td>
+        </tr>
+      </table>
+    <!--Table-->
+    <table>
+      <!--Row-1-->
+      <tr>
+        <td id="headerlocation">
+          <button onclick="window.location.href='/home';">Home</button>
+          <button onclick="window.location.href='/student/registered';">Registered class</button>
+          <button onclick="window.location.href='/student/register/course';">Register course</button>
+          <button onclick="window.location.href='/student/register/class';">Register class</button>
+          <button type="button" onclick="window.location.href='/student/predict';">Predict</button>
+          <button onclick="window.location.href='/logout';">Log out</button>
+          <button id="gd" style="color: greenyellow;">mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: white; color: red;"><CENTER>Điểm học phần</CENTER></td>
+      </tr>
+      <tr>
+        <td>
+          <!--Nested Table-->
+          <table class="list" id="stdlist">
+            <!--Table Head-->
+            <thead>
+              <!--Row-2-->
+              <tr>
+                <th>Course Name</th>
+                <th>Course ID</th>
+                <th>Credit</th>
+                <th>Credit_HP</th>
+                <th>faculty</th>
+                <th>compulsory</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
+            <!--Table Body-->
+            <tbody>
+            </tbody>
+          </table>
+          <button onclick="checkGraduation();">Check graduate condition</button>
+          <br>
+          <label id="graduationStatus"></label>
+        </td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: rgb(0, 128, 58)">
+                        <div style="text-align: center">
+                            Trang admin phòng Đào tạo Đại học trường Đại học Bách Khoa Hà Nội
+                        </div>
+                        <p align="center" style="font-size: small; color: #800000" class="status_text">
+                            Hanoi University of Science and Technology - No. 1, Dai Co Viet Str., Hanoi, Vietnam
+                            <br>
+                            Tel: (+844)38682305, (+844)38692008 - E-mail: <a href="mailto:dt@hust.edu.vn" id="A2" class="custom">abc@mail.hust.edu.vn</a>
+                        </p>
+        </td>
+      </tr>
+    </table>
+
+    <link rel='stylesheet' type='text/css' href='/style.css'/>
+    <script>
+      function showCurriculum() {
+          console.log("1");
+          fetch('/student/enrolment')
+              .then(res1 => res1.json())
+              .then(data1 => {
+                  let gradeMap = new Map();
+                  let gradeMap1= new Map();
+                  data1.forEach(row => {
+                      gradeMap1.set(row.course_id, row.total);
+                      if (row.midterm_score && row.final_score) {
+                          let grade = row.midterm_score * row.progress_weight + (1 - row.progress_weight) * row.final_score;
+                          gradeMap.set(row.course_id, grade);
+                      }
+                  });
+                  fetch('/student/curriculum')
+	              .then(res2 => res2.json())
+	              .then(data2 => {
+                          let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+	                  while (table.rows.length > 1) {
+		              table.deleteRow(table.rows.length - 1);
+	                  }
+	                  data2.forEach(row => {
+                              let tableRow = table.insertRow(table.length);
+                              let cell = tableRow.insertCell(0);
+                              cell.innerHTML = row.course_name;
+                              cell = tableRow.insertCell(1);
+                              cell.innerHTML = row.course_id;
+                              cell = tableRow.insertCell(2);
+                              cell.innerHTML = row.credit;
+                              cell = tableRow.insertCell(3);
+                              cell.innerHTML = row.credit_HP;
+                              cell = tableRow.insertCell(4);
+                              cell.innerHTML = row.faculty;
+                              if (row.compulsory == "Y"){
+                              cell = tableRow.insertCell(5);
+                              cell.innerHTML = '<input type="checkbox" checked="checked" disabled></input>';
+                              }else {
+                                cell = tableRow.insertCell(5);
+                                cell.innerHTML = '<input type="checkbox" disabled></input>';
+                              }
+                              cell = tableRow.insertCell(6);
+                              if (gradeMap1.has(row.course_id)) {
+                                  cell.innerHTML = gradeMap1.get(row.course_id);
+                              }
+	                  });
+	              });
+              });
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+          showCurriculum();
+      }, false);
+
+      function checkGraduation() {
+          let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+          let status = '';
+          for (let i = 0, row; row = table.rows[i]; i += 1) {
+              if (row.cells[3].innerHTML == '') {
+                  status += 'Course "' + row.cells[0].innerHTML + '" is required for graduation. ';
+              }
+          }
+          document.getElementById("graduationStatus").innerHTML = status;
+      }
+    </script>
+  </body>
+</html>

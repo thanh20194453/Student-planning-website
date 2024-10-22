@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Title-->
+    <title>Admin homepage</title>
+    <!-- CSS File-->
+  </head>
+  <body style="background-color: skyblue">
+    <div id="container">
+      <table>
+        <tr>
+          <td><img src="https://ctt-sis.hust.edu.vn/Content/Images/logo-cttdt.png" alt=""></td>
+        </tr>
+      </table>
+    <!--Table-->
+    <table>
+      <tr>
+        <td id="headerlocation">
+          <button onclick="window.location.href='/home';">Home</button>
+          <button onclick="window.location.href='/admin/account';">Manage account</button>
+          <button onclick="window.location.href='/admin/course';">Manage course</button>
+          <button onclick="window.location.href='/admin/course-requirement';">Manage course requirement</button>
+          <button onclick="window.location.href='/admin/class';">Manage class</button>
+          <button onclick="window.location.href='/admin/registration';">Manage registration</button>
+          <button onclick="window.location.href='/admin/semester-class';">Manage semester class</button>
+          <button onclick="window.location.href='/logout';">Log out</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: white; color: red;"><CENTER>Thay đổi kì học hiện tại và trạng thái</CENTER></td>
+      </tr>
+      <tr>
+        <td>
+          <table>
+            <thead>
+              <tr>
+                <th>Current semester</th>
+                <th>Registration state</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <input id="semesterInput"></input>
+                </td>
+                <td>
+                  <select id="registrationState">
+                    <option value="COURSE">Registering courses</option>
+                    <option value="CLASS">Registering classes</option>
+                    <option value="SEMESTER">Start semester</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- <label style="font-size:19px">Current semester:</label> -->
+          <button id="updateButton" onclick="updateSemester();">Update</button>
+          <label id="statusLabel"></label>
+        </td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: rgb(0, 128, 58)">
+                        <div style="text-align: center">
+                            Trang admin phòng Đào tạo Đại học trường Đại học Bách Khoa Hà Nội
+                        </div>
+                        <p align="center" style="font-size: small; color: #800000" class="status_text">
+                            Hanoi University of Science and Technology - No. 1, Dai Co Viet Str., Hanoi, Vietnam
+                            <br>
+                            Tel: (+844)38682305, (+844)38692008 - E-mail: <a href="mailto:dt@hust.edu.vn" id="A2" class="custom">abc@mail.hust.edu.vn</a>
+                        </p>
+        </td>
+      </tr>
+    </table>
+    
+    <link rel='stylesheet' type='text/css' href='/style.css'/>
+    <script>
+      function updateH3() {
+          fetch('/admin/get/semester')
+              .then(res => res.json())
+              .then(data => {
+                  document.getElementById('semesterInput').value = data[0].current_s;
+                  let s_time = data[0].s_time;
+                  if (s_time === 'COURSE') {
+                      s_time = 0;
+                  } else if (s_time === 'CLASS') {
+                      s_time = 1;
+                  } else {
+                      s_time = 2;
+                  }
+                  document.getElementById('registrationState').options.selectedIndex = s_time;
+              });
+      }
+
+      function updateSemester() {
+          let t = document.getElementById('registrationState').options;
+          let data = [];
+          data.push(document.getElementById('semesterInput').value);
+          data.push(t[t.selectedIndex].value);
+          fetch('/admin/update/semester', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+          })
+              .then(res => res.text())
+              .then(data => {
+                  document.getElementById('statusLabel').innerHTML = data;
+              });
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+          updateH3();
+      }, false);
+    </script>
+  </div>
+  </body>
+</html>

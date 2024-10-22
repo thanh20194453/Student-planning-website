@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Title-->
+    <title>Class management</title>
+    <!-- CSS File-->
+  </head>
+  <body style="background-color: skyblue">
+    <div id="container">
+      <table>
+        <tr>
+          <td><img src="https://ctt-sis.hust.edu.vn/Content/Images/logo-cttdt.png" alt=""></td>
+        </tr>
+      </table>
+    <!--Table-->
+    <table>
+      <tr>
+        <td colspan="2" id="headerlocation">
+          <button type="button" onclick="window.location.href='/home';">Home</button>
+          <button type="button" onclick="window.location.href='/teacher/midterm';">Edit midterm score</button>
+          <button type="button" onclick="window.location.href='/teacher/final';">Edit final score</button>
+          <button onclick="window.location.href='/logout';">Log out</button>
+          <button id="gd" style="color: greenyellow;">mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm</button>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: white; color: red;"><CENTER>Nhập điểm cuối kì</CENTER></td>
+      </tr>
+      <!--Row-1-->
+      <tr>
+        <!--Column-1-->
+        <td >
+          <!--Form-->
+          <form onsubmit="event.preventDefault();showClassStudent();" autocomplete="off">
+            <div>
+              <b><label style="font-size:18px">Class ID</label></b>
+              <!--Input Student Class-->
+              <input type="text" name="stdClass" id="stdClass" placeholder="Enter Class ID">
+            </div>
+            <div class="form-action-buttons">
+              <!--Input Button-->
+              <input type="submit" value="Search">
+              <center><label id="findStatus"></label></center>
+            </div>
+          </form>
+        </td>
+        <!--Column-2-->
+        <td>
+          <!--Nested Table-->
+          <table class="list" id="stdlist" style="background-color: #C2976D;">
+            <!--Table Head-->
+            <thead>
+              <!--Row-2-->
+              <tr>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Class</th>
+                <th>Final</th>
+              </tr>
+            </thead>
+            <!--Table Body-->
+            <tbody>
+            </tbody>
+          </table>
+          <center>
+            <button onclick="updateScores();">Update scores</button>
+            <br>
+            <label id="updateStatus"></label>
+          </center>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: rgb(0, 128, 58)">
+                        <div style="text-align: center">
+                            Trang admin phòng Đào tạo Đại học trường Đại học Bách Khoa Hà Nội
+                        </div>
+                        <p align="center" style="font-size: small; color: #800000" class="status_text">
+                            Hanoi University of Science and Technology - No. 1, Dai Co Viet Str., Hanoi, Vietnam
+                            <br>
+                            Tel: (+844)38682305, (+844)38692008 - E-mail: <a href="mailto:dt@hust.edu.vn" id="A2" class="custom">abc@mail.hust.edu.vn</a>
+                        </p>
+        </td>
+      </tr>
+    </table>
+    
+    <link rel='stylesheet' type='text/css' href='/style.css'/>
+    <script>
+      let classID = null;
+
+      function updateScores() {
+          let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+          let data = [];
+          for (let i = 0, row; row = table.rows[i]; i += 1) {
+              data.push([row.cells[1].innerHTML, row.cells[3].childNodes[0].value]);
+          }
+          fetch('/teacher/update/final', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'class_id': classID
+              },
+              body: JSON.stringify(data)
+          })
+	      .then(res => res.text())
+	      .then(data => {
+                  document.getElementById('updateStatus').innerHTML = data;
+              });
+      }
+      
+      function showClassStudent() {
+          let class_id = document.getElementById('stdClass').value;
+          classID = class_id;
+          fetch('/teacher/class/list', {
+              method: 'GET',
+              headers: {
+                  'class_id': class_id
+              },
+          })
+	      .then(res => res.json())
+	      .then(data => {
+                  let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+                  while (table.rows.length > 0) {
+		      table.deleteRow(table.rows.length - 1);
+	          }
+                  if (data.length < 1) {
+                      document.getElementById('findStatus').innerHTML = 'Class not found/You\'re not assigned to this class';
+                      return;
+                  }
+                  document.getElementById('findStatus').innerHTML = null;
+                  data.forEach(row => {
+                      progressWeight = row.progress_weight;
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = row.name;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = row.student_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = row.class_id;
+                      cell = tableRow.insertCell(3);
+                      cell.innerHTML = '<input></input>';
+                      cell.childNodes[0].value = row.final_score;
+	          });
+              });
+      }
+    </script>
+    </div>
+  </body>
+</html>

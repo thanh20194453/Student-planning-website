@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Title-->
+    <title>Course registration</title>
+    <!-- CSS File-->
+  </head>
+  <body style="background-color: skyblue">
+    <div id="container">
+      <table>
+        <tr>
+          <td><img src="https://ctt-sis.hust.edu.vn/Content/Images/logo-cttdt.png" alt="" style="width: 1080px; height: 160px;"></td>
+        </tr>
+      </table>
+    <!--Table-->
+    <table>
+      <tr>
+        <td colspan="4" id="headerlocation">
+          <button type="button" onclick="window.location.href='/home';">Home</button>
+          <button type="button" onclick="window.location.href='/student/registered';">Registered class</button>
+          <button type="button" onclick="window.location.href='/student/register/course';">Register course</button>
+          <button type="button" onclick="window.location.href='/student/register/class';">Register class</button>
+          <button type="button" onclick="window.location.href='/student/predict';">Predict</button>
+          <button onclick="window.location.href='/logout';">Log out</button>
+          <button id="gd" style="color: greenyellow;">mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm1</button>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: white; color: red;"><CENTER>Lập kế hoạch</CENTER></td>
+      </tr>
+      <!--Row-1-->
+      <tr>
+        <td colspan="1">
+          <button style="color: white;background-color: blue; width: 140px;" onclick="onbatdau();">Start</button>
+          <div id="err" style="color: red"> </div>
+        </td>
+        <td colspan="1">
+          <button style="color: white;background-color: blue;width: 140px;" onclick="window.location.href='/student/register/course';">Register course</button>
+        </td>
+        <td colspan="1">
+          <button style="color: white;background-color: blue;width: 140px;" onclick="onpredict();">Predict</button>
+        </td>
+        <td colspan="1">
+          <button style="color: white;background-color: blue;width: 140px;" onclick="onpredict2();">Make plan</button>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: white; color: red;"><CENTER>Bảng danh sách học phần</CENTER></td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          <table id="predict_table">
+            <!--Table Head-->
+            <thead>
+              <!--Row-2-->
+              <tr>
+                <th>Course Name</th>
+                <th>Course ID</th>
+                <th>Credit</th>
+                <th>Credit-HP</th>
+                <th>Progress weight</th>
+                <th>Semester</th>
+                <th>Score</th>
+                <th>Pre-Score</th>
+                <th>Score-predict</th>
+                <th>Compulsory</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <!--Table Body-->
+          </table>
+        </td>
+      </tr>
+      <tr style="background-color: white;">
+        <td colspan="4">
+          <div id="divcpa">Số CPA đạt được: </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: rgb(0, 128, 58)">
+                        <div style="text-align: center">
+                            Trang admin phòng Đào tạo Đại học trường Đại học Bách Khoa Hà Nội
+                        </div>
+                        <p align="center" style="font-size: small; color: #800000" class="status_text">
+                            Hanoi University of Science and Technology - No. 1, Dai Co Viet Str., Hanoi, Vietnam
+                            <br>
+                            Tel: (+844)38682305, (+844)38692008 - E-mail: <a href="mailto:dt@hust.edu.vn" id="A2" class="custom">abc@mail.hust.edu.vn</a>
+                        </p>
+        </td>
+      </tr>
+    </table>
+    
+    <div class="popup-overlay" id="popupOverlay">
+
+      <div class="popup" id="popup">
+  
+          <span class="close" id="closePopup">&times;</span>
+  
+          <div class="popup-content">
+  
+              <p id ="p0" style="color: red">Kết quả dự đoán điểm</p>
+  
+              <p id ="p1" style="color: blue"></p>
+
+              <p id ="p2" style="color: blue">null</p>
+
+              <p id ="p3" style="color: blue"></p>
+
+              <p id ="p4" style="color: blue"></p>
+  
+          </div>
+  
+      </div>
+  
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay2">
+
+      <div class="popup" id="popup2">
+  
+          <span class="close" id="closePopup2">&times;</span>
+  
+          <div class="popup-content">
+              <p id ="p13" style="color: red"></p>
+
+              <p id ="p12" style="color: blue">Nhập số điểm mong muốn:(số thập phân có tối đa 2 chữ số ở phần thập phân)</p>
+
+              <input type="text" id="diemmm" name="fname"> <br>
+
+              <button style="color: white;background-color: blue;width: 140px;" onclick="onpredict3();">Start </button>
+  
+          </div>
+  
+      </div>
+  
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay3">
+
+      <div class="popup" id="popup3">
+  
+          <span class="close" id="closePopup3">&times;</span>
+  
+          <div class="popup-content">
+  
+              <p id ="p03" style="color: red">Bấm tiếp tục để nhận kết quả</p>
+  
+              <button style="color: white;background-color: blue;width: 140px;" onclick="ketthuc();">tiếp tục </button>
+  
+          </div>
+  
+      </div>
+  
+    </div>
+    <link rel='stylesheet' type='text/css' href='/style.css'/>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+
+        showPredictCourse();
+
+        const popupOverlay = document.getElementById('popupOverlay');
+
+        const popup = document.getElementById('popup');
+
+        const closePopup = document.getElementById('closePopup');
+
+        const emailInput = document.getElementById('emailInput');
+
+
+        // Function to close the popup
+
+        function closePopupFunc1() {
+
+            popupOverlay.style.display = 'none';
+
+        }
+
+
+        // Close the popup when the close button is clicked
+
+        closePopup.addEventListener('click', closePopupFunc1);
+
+        // Close the popup when clicking outside the popup content
+
+        popupOverlay.addEventListener('click', function (event) {
+
+            if (event.target === popupOverlay) {
+
+                closePopupFunc1();
+
+            }
+
+        });
+
+        const popupOverlay2 = document.getElementById('popupOverlay2');
+
+        const popup2 = document.getElementById('popup2');
+
+        const closePopup2 = document.getElementById('closePopup2');
+
+        // Function to close the popup
+
+        function closePopupFunc2() {
+
+            popupOverlay2.style.display = 'none';
+
+        }
+
+
+        // Close the popup when the close button is clicked
+
+        closePopup2.addEventListener('click', closePopupFunc2);
+
+        // Close the popup when clicking outside the popup content
+
+        popupOverlay2.addEventListener('click', function (event) {
+
+            if (event.target === popupOverlay2) {
+
+                closePopupFunc2();
+
+            }
+
+        });
+
+        const popupOverlay3 = document.getElementById('popupOverlay3');
+
+        const popup3 = document.getElementById('popup3');
+
+        const closePopup3 = document.getElementById('closePopup3');
+
+        // Function to close the popup
+
+        function closePopupFunc3() {
+
+            popupOverlay3.style.display = 'none';
+
+        }
+        // Close the popup when the close button is clicked
+
+        closePopup3.addEventListener('click', closePopupFunc3);
+
+        // Close the popup when clicking outside the popup content
+
+        popupOverlay3.addEventListener('click', function (event) {
+
+            if (event.target === popupOverlay3) {
+
+                closePopupFunc3();
+
+            }
+
+        });
+        });
+      function showPredictCourse() {
+          fetch('/student/predict-course')
+	      .then(res => res.json())
+	      .then(data => {
+                  var table = document.getElementById("predict_table").getElementsByTagName('tbody')[0];
+                  while (table.rows.length > 0) {
+		      table.deleteRow(table.rows.length - 1);
+	          }
+	          data.forEach(row => {
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = row.course_name;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = row.course_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = row.credit;
+                      cell = tableRow.insertCell(3);
+                      cell.innerHTML = row.credit_HP;
+                      cell = tableRow.insertCell(4);
+                      cell.innerHTML = row.progress_weight;
+                      cell = tableRow.insertCell(5);
+                      cell.innerHTML = row.semester;
+                      cell = tableRow.insertCell(6);
+                      cell.innerHTML = row.total;
+                      cell = tableRow.insertCell(7);
+                      cell = tableRow.insertCell(8);
+                      cell.innerHTML = '<input></input>';
+                      if (row.compulsory == "Y"){
+                        cell = tableRow.insertCell(9);
+                        cell.innerHTML = '<input type="checkbox" checked="checked" disabled></input>';
+                      }else {
+                        cell = tableRow.insertCell(9);
+                        cell.innerHTML = '<input type="checkbox" disabled></input>';
+                      }
+	          });
+	      });
+      }
+      
+      
+
+      
+
+      function onAddCourse() {
+          let course_id = document.getElementById('courseID').value;
+          fetch('/student/course/list', {
+              method: 'GET',
+              headers: {
+                  'course_id': course_id
+              },
+          })
+	      .then(res => res.json())
+	      .then(data => {
+                  let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+                  if (data.length < 1) {
+                      document.getElementById("findStatus").innerHTML = 'Course ' + course_id + ' not found';
+                      return;
+                  }
+                  document.getElementById("findStatus").innerHTML = null;
+                  data.forEach(row => {
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = row.course_name;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = row.course_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = row.credit;
+                      cell = tableRow.insertCell(3);
+                      cell.innerHTML = row.progress_weight;
+                      cell = tableRow.insertCell(4);
+                      cell.innerHTML = `<a onClick="onDelete(this)">Delete</a>`;
+	          });
+              });
+      }
+
+      function onDelete(td) {
+          selectedRow = td.parentElement.parentElement;
+          selectedRow.parentNode.removeChild(selectedRow);
+      }
+
+      function onRegister() {
+          let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+          let data = [];
+          for (let i = 0, row; row = table.rows[i]; i += 1) {
+              data.push(row.cells[1].innerText);
+          }
+          fetch('/student/register-course/update', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+          })
+	      .then(res => res.text())
+	      .then(data => {
+                  document.getElementById("registerStatus").innerHTML = data;
+              });
+      }
+
+      function onbatdau() {
+          let table = document.getElementById("predict_table").getElementsByTagName('tbody')[0];
+          var cpa=0;
+          var chu=["A+","A","B+","B","C+","C","D+","D","F"];
+          var so=[4,4,3.5,3,2.5,2,1.5,1,0];
+          var m=0;
+          for (let i = 0, row; row = table.rows[i]; i += 1) {
+              if (chu.includes(row.cells[8].childNodes[0].value)){
+                for (let j = 0; j<9; j += 1){
+                  if (row.cells[8].childNodes[0].value == chu[j]){
+                    m=m+ Number(row.cells[2].innerHTML);
+                    cpa= cpa + Number(row.cells[2].innerHTML) * so[j];
+                  }
+                }
+              }
+          }
+          cpa =cpa/m;
+          if (isNaN(cpa)){
+            document.getElementById("err").innerHTML = "Score predict need input: A+,A,B+,B,C+,C,D+,D,F";
+          }
+          else{
+            document.getElementById("err").innerHTML = "Success";
+            document.getElementById("divcpa").innerHTML = "Số CPA đạt được: " + cpa;
+          }
+        /*} else{
+          let table = document.getElementById("predict_table").getElementsByTagName('tbody')[0];
+          document.getElementById("divsotien").innerHTML = table.rows[0].cells[8].childNodes[0].value;
+          let bang = [];
+          for (let i = 0, row; row = table.rows[i]; i += 1) {
+              if (row.cells[2].innerText)
+              e= [row.cells[2].innerText,row.cells[3].innerText, row.cells[5].innerText,row.cells[6].innerText,row.cells[7].innerText,row.cells[8].childNodes[0].value,row.cells[10].childNodes[0].checked]
+              data.push(e);
+          }
+          fetch('/student/predict/sotin', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+          })
+	      .then(res => res.text())
+	      .then(data => {
+                  document.getElementById("registerStatus").innerHTML = data;
+              });
+        }*/
+      }
+
+      function thucong() {
+        document.getElementById("chucnang").innerHTML = "<CENTER>Nhập các trường trước khi tra cứu(Nếu không nhập mặc định là không xét đến1)</CENTER>";
+      }
+
+      function onpredict() {
+        fetch('/student/predict-score')
+	      .then(res => res.json())
+	      .then(data => {
+          var table1 = document.getElementById("predict_table").getElementsByTagName('tbody')[0];
+          var cpa1=0;
+          var chu1=["A+","A","B+","B","C+","C","D+","D","F"];
+          var so1=[4,4,3.5,3,2.5,2,1.5,1,0];
+          var m1=0;
+          for (let i = 0, row; row = table1.rows[i]; i += 1) {
+            for (let k = 0; k<data[3].length; k += 1){
+              if (data[3][k][0]== row.cells[1].childNodes[0].nodeValue){
+                for (let j = 0; j<9; j += 1){
+                  if (data[3][k][1] == chu1[j]){
+                    cpa1= cpa1 * m1;
+                    m1=m1+ Number(row.cells[2].childNodes[0].nodeValue);
+                    cpa1= (cpa1 + Number(row.cells[2].childNodes[0].nodeValue) * so1[j])/m1;
+                  }
+                }
+              }  
+            }
+          }
+          let u50=[];
+          for (let j = 0; j<data[2].length; j += 1) {
+            for (let i = 0, row; row = table1.rows[i]; i += 1) {
+              if(row.cells[1].childNodes[0].nodeValue==data[2][j]){
+                if(row.cells[2].childNodes[0].nodeValue!='0'){
+                  u50.push(data[2][j]);
+                }
+              }
+            } 
+          }
+          document.getElementById("p1").innerHTML = 'Trung bình bạn nằm trong top: ' + data[0] +'% của lớp';
+          document.getElementById("p3").innerHTML = 'Các môn bạn có điểm thuộc nhóm <50%: ' + u50;
+          document.getElementById("p4").innerHTML = 'Các môn nhiều sinh viên học đạt điểm cao: ' + data[1];
+          document.getElementById("p2").innerHTML = 'Điểm dự đoán nếu giữu vững phong độ cho đến khi ra trường: '+ cpa1;
+	      });
+        const popupOverlay = document.getElementById('popupOverlay');
+        popupOverlay.style.display = 'block';
+      }
+
+      function onpredict2() {
+        let table5 = document.getElementById("predict_table").getElementsByTagName('tbody')[0];
+        for (let i = 0, row; row = table5.rows[i]; i += 1) {
+          row.cells[7].innerHTML= null;
+        }
+        document.getElementById("p13").innerHTML=''
+        const popupOverlay2 = document.getElementById('popupOverlay2');
+        popupOverlay2.style.display = 'block';
+      }
+
+      function onpredict3() {
+        if(Number(document.getElementById("diemmm").value)>4 || Number(document.getElementById("diemmm").value)<0 || document.getElementById("diemmm").value.length>4 || isNaN(Number(document.getElementById("diemmm").value))){
+          document.getElementById("p13").innerHTML='Định dạng input chưa đúng'
+        }else{
+          fetch('/student/predict-score1')
+          .then(res => res.json())
+          .then(data => {
+            let table3 = document.getElementById("predict_table").getElementsByTagName('tbody')[0];
+            let datatb=[[document.getElementById("diemmm").value,0,0,0,0,0,0]];
+            for (let i = 0, row; row = table3.rows[i]; i += 1) {
+              let rowtb=['',0,0,0,0,'',''];
+              rowtb[0]= row.cells[1].childNodes[0].nodeValue;
+              rowtb[1]= row.cells[2].childNodes[0].nodeValue;
+              rowtb[2]= row.cells[3].childNodes[0].nodeValue;
+              rowtb[3]= row.cells[6].childNodes[0].nodeValue;
+              rowtb[4]= row.cells[9].childNodes[0].checked;
+              datatb.push(rowtb);
+              for (let j = 0; j < data[4].length; j += 1) {
+                if(rowtb[0]== data[4][j][9]){
+                  rowtb[5]= data[4][j][10];
+                  rowtb[6]= data[4][j][11];
+                }
+              }
+            }
+            fetch('/student/predict-python', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(datatb)
+              })
+            .then(res => res.json())
+            .then(data1 => {
+            });
+          });
+          const popupOverlay2 = document.getElementById('popupOverlay2');
+          popupOverlay2.style.display = 'none';
+          const popupOverlay3 = document.getElementById('popupOverlay3');
+          popupOverlay3.style.display = 'block';
+        }
+      }
+
+      function ketthuc() {
+        const popupOverlay3 = document.getElementById('popupOverlay3');
+        popupOverlay3.style.display = 'none';
+        fetch('/student/layketqua')
+	      .then(res => res.json())
+	      .then(data => {
+          if (data.length>2){
+            let table4 = document.getElementById("predict_table").getElementsByTagName('tbody')[0];
+            for (let i = 0, row; row = table4.rows[i]; i += 1) {
+              for (let j = 0; j<data.length; j += 1){
+                if (row.cells[1].childNodes[0].nodeValue == data[j].split(' ')[0] && data[j].split(' ')[1]=='1'){
+                  row.cells[7].innerHTML= data[j].split(' ')[2];
+                }
+              }
+            }
+            // var cpa=0;
+            // var chu=["A+","A","B+","B","C+","C","D+","D","F"];
+            // var so=[4,4,3.5,3,2.5,2,1.5,1,0];
+            // var m=0;
+            // for (let i = 0, row; row = table4.rows[i]; i += 1) {
+            //   document.getElementById("err").innerHTML =(table4.rows[1].cells[7].nodeValue == null);
+            //   if (row.cells[7].nodeValue != null){
+            //     if (chu.includes(row.cells[7].childNodes[0].nodeValue)){
+            //       document.getElementById("err").innerHTML = document.getElementById("err").innerHTML+'1';
+            //       for (let j = 0; j<9; j += 1){
+            //         document.getElementById("err").innerHTML = document.getElementById("err").innerHTML+'2';
+            //         if (row.cells[7].childNodes[0].nodeValue == chu[j]){
+            //           m=m+ Number(row.cells[2].innerHTML);
+            //           cpa= cpa + Number(row.cells[2].innerHTML) * so[j];
+            //         }
+            //       }
+            //     }
+            //   }
+            // }
+            // cpa =cpa/m;
+          }else{
+            document.getElementById("p1").innerHTML = 'Bạn không thể đạt được số điểm này trừ khi học lại các môn đã học';
+            document.getElementById("p3").innerHTML = '';
+            document.getElementById("p4").innerHTML = ' ';
+            document.getElementById("p2").innerHTML = '';
+            const popupOverlay = document.getElementById('popupOverlay');
+            popupOverlay.style.display = 'block';  
+          }
+        });
+      }
+    </script>
+    </div>
+  </body>
+</html>

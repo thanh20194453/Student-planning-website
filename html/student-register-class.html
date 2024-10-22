@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Title-->
+    <title>Class registration</title>
+    <!-- CSS File-->
+  </head>
+  <body style="background-color: skyblue">
+    <div id="container">
+      <table>
+        <tr>
+          <td><img src="https://ctt-sis.hust.edu.vn/Content/Images/logo-cttdt.png" alt="" style="width: 1080px; height: 160px;"></td>
+        </tr>
+      </table>
+    <!--Table-->
+    <table>
+      <tr>
+        <td id="headerlocation" colspan="2">
+          <button type="button" onclick="window.location.href='/home';">Home</button>
+          <button type="button" onclick="window.location.href='/student/registered';">Registered class</button>
+          <button type="button" onclick="window.location.href='/student/register/course';">Register course</button>
+          <button type="button" onclick="window.location.href='/student/register/class';">Register class</button>
+          <button type="button" onclick="window.location.href='/student/predict';">Predict</button>
+          <button onclick="window.location.href='/logout';">Log out</button>
+          <button id="gd" style="color: greenyellow;">mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm</button>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: white; color: red;"><CENTER>Đăng kí lớp </CENTER></td>
+      </tr>
+      <!--Row-1-->
+      <tr>
+        <!--Column-1-->
+        <td>
+          <a>> Thêm lớp bằng ID</a>
+          <!--Form-->
+          <form onsubmit="event.preventDefault();onAddClass();" autocomplete="off">
+            <!--div-2-->
+            <div>
+              <b><label style="font-size:18px">Class ID</label></b>
+              <!--Input Roll No-->
+              <input type="text" name="classID" id="classID" placeholder="Enter class ID">
+            </div>
+            
+            <!--div-6-->
+            <div class="form-action-buttons">
+              <!--Input Button-->
+              <input type="submit" value="Add">
+            </div>
+            <center>
+              <label id="findStatus"></label>
+            </center>
+          </form>
+          <a>> Danh sách học phần</a>
+          <br></br>
+          <input placeholder="Enter Course ID">  Nhập mã học phần để tìm</input>
+          <table id="stdlist1">
+            <!--Table Head-->
+            <thead>
+              <!--Row-2-->
+              <tr>
+                <th>Course Name</th>
+                <th>Course ID</th>
+                <th>Class ID</th>
+                <th>Class day</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <th>Giải tích 1</th>
+              <th>MI1016</th>
+              <th>123588</th>
+              <th>THURSDAY</th>
+              <th>7:45:00</th>
+              <th>11:30:00</th>
+              <th><a>Thêm</a></th>
+            </tr>
+            <tr>
+              <th>Xác xuất thống kê</th>
+              <th>MI1017</th>
+              <th>123589</th>
+              <th>FRIDAY</th>
+              <th>14:30:00</th>
+              <th>17:30:00</th>
+              <th><a>Thêm</a></th>
+            </tr>
+            </tbody>
+            <!--Table Body-->
+          </table>
+        </td>
+        <!--Column-2-->
+        <td>
+          <!--Nested Table-->
+          <table class="list" id="stdlist" style="background-color: #C2976D;">
+            <!--Table Head-->
+            <thead>
+              <!--Row-2-->
+              <tr>
+                <th>Course Name</th>
+                <th>Course ID</th>
+                <th>Class ID</th>
+                <th>Class day</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <!--Table Body-->
+            <tbody>
+            </tbody>
+          </table>
+          <center>
+            <button type="button" onclick="onRegister();">
+              Register
+            </button>
+            <br>
+            <label id="registerStatus"></label>
+          </center>
+        </td>
+      </tr>
+      <tr>
+        <td class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: rgb(0, 128, 58)">
+                        <div style="text-align: center">
+                            Trang admin phòng Đào tạo Đại học trường Đại học Bách Khoa Hà Nội
+                        </div>
+                        <p align="center" style="font-size: small; color: #800000" class="status_text">
+                            Hanoi University of Science and Technology - No. 1, Dai Co Viet Str., Hanoi, Vietnam
+                            <br>
+                            Tel: (+844)38682305, (+844)38692008 - E-mail: <a href="mailto:dt@hust.edu.vn" id="A2" class="custom">abc@mail.hust.edu.vn</a>
+                        </p>
+        </td>
+      </tr>
+    </table>
+    <link rel='stylesheet' type='text/css' href='/style.css'/>
+    <script>
+      function showRegisteredClass() {
+          fetch('/student/register/registered-class')
+	      .then(res => res.json())
+	      .then(data => {
+                  var table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+                  while (table.rows.length > 0) {
+		      table.deleteRow(table.rows.length - 1);
+	          }
+	          data.forEach(row => {
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = row.course_name;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = row.course_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = row.class_id;
+                      cell = tableRow.insertCell(3);
+                      cell.innerHTML = row.class_day;
+                      cell = tableRow.insertCell(4);
+                      cell.innerHTML = row.start_time;
+                      cell = tableRow.insertCell(5);
+                      cell.innerHTML = row.end_time;
+                      cell = tableRow.insertCell(6);
+                      cell.innerHTML = `<a onClick="onDelete(this)">Delete</a>`;
+	          });
+	      });
+      }
+
+      function showAllClass() {
+          fetch('/student/list/registered-class')
+	      .then(res => res.json())
+	      .then(data => {
+                  var table = document.getElementById("stdlist1").getElementsByTagName('tbody')[0];
+                  while (table.rows.length > 0) {
+		      table.deleteRow(table.rows.length - 1);
+	          }
+	          data.forEach(row => {
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = row.course_name;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = row.course_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = row.class_id;
+                      cell = tableRow.insertCell(3);
+                      cell.innerHTML = row.class_day;
+                      cell = tableRow.insertCell(4);
+                      cell.innerHTML = row.start_time;
+                      cell = tableRow.insertCell(5);
+                      cell.innerHTML = row.end_time;
+                      cell = tableRow.insertCell(6);
+                      cell.innerHTML = `<a onClick="onAdd(this)">Add</a>`;
+	          });
+	      });
+      }
+      
+      document.addEventListener('DOMContentLoaded', function() {
+          showRegisteredClass();
+          showAllClass();
+      }, false);
+
+      function onAddClass() {
+          let class_id = document.getElementById('classID').value;
+          fetch('/student/class/list', {
+              method: 'GET',
+              headers: {
+                  'class_id': class_id
+              },
+          })
+	      .then(res => res.json())
+	      .then(data => {
+                  let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+                  if (data.length < 1) {
+                      document.getElementById("findStatus").innerHTML = 'Class ' + class_id + ' not found';
+                      return;
+                  }
+                  document.getElementById("findStatus").innerHTML = null;
+                  data.forEach(row => {
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = row.course_name;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = row.course_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = row.class_id;
+                      cell = tableRow.insertCell(3);
+                      cell.innerHTML = row.class_day;
+                      cell = tableRow.insertCell(4);
+                      cell.innerHTML = row.start_time;
+                      cell = tableRow.insertCell(5);
+                      cell.innerHTML = row.end_time;
+                      cell = tableRow.insertCell(6);
+                      cell.innerHTML = '<a onClick="onDelete(this)">Delete</a>';
+	          });
+              });
+      }
+
+      function onAdd(td) {
+        selectedRow = td.parentElement.parentElement;
+        class_id = selectedRow.cells[2].innerHTML;
+          fetch('/student/class/list', {
+              method: 'GET',
+              headers: {
+                  'class_id': class_id
+              },
+          })
+	      .then(res => res.json())
+	      .then(data => {
+                  let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+                  if (data.length < 1) {
+                      document.getElementById("findStatus").innerHTML = 'Class ' + class_id + ' not found';
+                      return;
+                  }
+                  document.getElementById("findStatus").innerHTML = null;
+                  data.forEach(row => {
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = row.course_name;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = row.course_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = row.class_id;
+                      cell = tableRow.insertCell(3);
+                      cell.innerHTML = row.class_day;
+                      cell = tableRow.insertCell(4);
+                      cell.innerHTML = row.start_time;
+                      cell = tableRow.insertCell(5);
+                      cell.innerHTML = row.end_time;
+                      cell = tableRow.insertCell(6);
+                      cell.innerHTML = '<a onClick="onDelete(this)">Delete</a>';
+	          });
+              });
+      }
+
+      function onDelete(td) {
+          selectedRow = td.parentElement.parentElement;
+          selectedRow.parentNode.removeChild(selectedRow);
+      }
+
+      const func = function (cid, cmap, gmap) {
+          let lst = cmap.get(cid);
+              for (let i = 0, new_cid; new_cid = lst[i]; i += 1) {
+                  if (!gmap.has(new_cid)) return new_cid;
+                  let res = func(new_cid, cmap, gmap);
+                  if (res) return res;
+              }
+          return null;
+      };
+      
+      function onRegister() {
+          fetch('/student/previous-enrolment')
+              .then(res1 => res1.json())
+              .then(data1 => {
+                  let gradeMap = new Map();
+                  data1.forEach(row => {
+                      if (row.midterm_score && row.final_score) {
+                          let grade = row.midterm_score * row.progress_weight + (1 - row.progress_weight) * row.final_score;
+                          gradeMap.set(row.course_id, grade);
+                      }
+                  });
+                  fetch('/student/curriculum')
+	              .then(res2 => res2.json())
+	              .then(data2 => {
+                          let courseMap = new Map();
+	                  data2.forEach(row => {
+                              courseMap.set(row.course_id, []);
+	                  });
+                          fetch('/student/get/course-requirement')
+	                      .then(res3 => res3.json())
+	                      .then(data3 => {
+	                          data3.forEach(row => {
+                                      if (courseMap.has(row.course_id) && courseMap.has(row.require_id)) {
+                                          courseMap.get(row.course_id).push(row.require_id);
+                                      }
+	                          });
+                                  let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+                                  let data = [];
+                                  for (let i = 0, row; row = table.rows[i]; i += 1) {
+                                      let cid = row.cells[1].innerText;
+                                      let res = func(cid, courseMap, gradeMap);
+                                      if (res) {
+                                          document.getElementById("registerStatus").innerHTML = `Course ${cid} requires course ${res} completion`;
+                                          return;
+                                      }
+                                      let e = [];
+                                      for (let j = 0, cell; cell = row.cells[j]; j += 1) {
+                                          if (j === 6) break;
+                                          e.push(cell.innerText);
+                                      }
+                                      data.push(e);
+                                  }
+                                  fetch('/student/register-class/update', {
+                                      method: 'POST',
+                                      headers: {
+                                          'Content-Type': 'application/json'
+                                      },
+                                      body: JSON.stringify(data)
+                                  })
+	                              .then(res4 => res4.text())
+	                              .then(data4 => {
+                                          document.getElementById("registerStatus").innerHTML = data4;
+                                      });
+                                  // console.log(courseMap);
+	                      });
+	              });
+              });
+      }
+    </script>
+    </div>
+  </body>
+</html>

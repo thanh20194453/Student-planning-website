@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Title-->
+    <title>Admin homepage</title>
+    <!-- CSS File-->
+  </head>
+  <body style="background-color: skyblue">
+    <div id="container">
+      <table>
+        <tr>
+          <td><img src="https://ctt-sis.hust.edu.vn/Content/Images/logo-cttdt.png" alt=""></td>
+        </tr>
+      </table>
+    <!--Table-->
+    <table>
+      <tr>
+        <td colspan="2" id="headerlocation">
+          <button onclick="window.location.href='/home';">Home</button>
+          <button onclick="window.location.href='/admin/account';">Manage account</button>
+          <button onclick="window.location.href='/admin/course';">Manage course</button>
+          <button onclick="window.location.href='/admin/course-requirement';">Manage course requirement</button>
+          <button onclick="window.location.href='/admin/class';">Manage class</button>
+          <button onclick="window.location.href='/admin/registration';">Manage registration</button>
+          <button onclick="window.location.href='/admin/semester-class';">Manage semester class</button>
+          <button onclick="window.location.href='/logout';">Log out</button>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: white; color: red;"><CENTER>Quản lý sinh viên đăng kí lớp</CENTER></td>
+      </tr>
+      <!--Row-1-->
+      <tr>
+        <!--Column-1-->
+        <td >
+          <!--Form-->
+          <form onsubmit="event.preventDefault();showClassStudent();" autocomplete="off">
+            <div>
+              <b><label style="font-size:18px">Class ID</label></b>
+              <!--Input Student Class-->
+              <input type="text" name="stdClass" id="stdClass" placeholder="Enter Class ID">
+            </div>
+            <div class="form-action-buttons">
+              <!--Input Button-->
+              <input type="submit" value="Search">
+              <center><label id="findStatus"></label></center>
+            </div>
+          </form>
+        </td>
+        <!--Column-2-->
+        <td>
+          <!--Nested Table-->
+          <table class="list" id="stdlist" style="background-color: #C2976D;">
+            <!--Table Head-->
+            <thead>
+              <!--Row-2-->
+              <tr>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Class</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <!--Table Body-->
+            <tbody>
+            </tbody>
+          </table>
+          <button onclick="onAddStudent();">Add student</button>
+          <input style="padding:5px" id="studentID" placeholder="Student ID"></input>
+          <br>
+          <button onclick="updateList();">Update student list</button>
+          <br>
+          <center>
+          <label id="updateStatus"></label>
+          </center>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: skyblue"></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="c5" style="padding: 10px 10px 10px 10px; margin: 0px; width: 100%; background-color: rgb(0, 128, 58)">
+                        <div style="text-align: center">
+                            Trang admin phòng Đào tạo Đại học trường Đại học Bách Khoa Hà Nội
+                        </div>
+                        <p align="center" style="font-size: small; color: #800000" class="status_text">
+                            Hanoi University of Science and Technology - No. 1, Dai Co Viet Str., Hanoi, Vietnam
+                            <br>
+                            Tel: (+844)38682305, (+844)38692008 - E-mail: <a href="mailto:dt@hust.edu.vn" id="A2" class="custom">abc@mail.hust.edu.vn</a>
+                        </p>
+        </td>
+      </tr>
+    </table>
+    
+    <link rel='stylesheet' type='text/css' href='/style.css'/>
+    <script>
+      function showClassStudent() {
+          document.getElementById('updateStatus').innerHTML = '';
+          let class_id = document.getElementById('stdClass').value;
+          classID = class_id;
+          fetch('/admin/get/registration-classes')
+              .then(res_ => res_.json())
+              .then(data_ => {
+                  let found = false;
+                  data_.forEach(row => {
+                      if (row.class_id === class_id) found = true;
+                  });
+                  if (!found) {
+                      document.getElementById('findStatus').innerHTML = 'Class not found';
+                      return;
+                  }
+                  fetch('/admin/get/semester-class', {
+                      method: 'GET',
+                      headers: {
+                          'class_id': class_id
+                      },
+                  })
+	              .then(res => res.json())
+	              .then(data => {
+                          let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+                          while (table.rows.length > 0) {
+		              table.deleteRow(table.rows.length - 1);
+	                  }
+                          if (data.length < 1) {
+                              document.getElementById('findStatus').innerHTML = 'No student register for this class yet';
+                          } else {
+                              document.getElementById('findStatus').innerHTML = '';
+                          }
+                          data.forEach(row => {
+                              progressWeight = row.progress_weight;
+                              let tableRow = table.insertRow(table.length);
+                              let cell = tableRow.insertCell(0);
+                              cell.innerHTML = row.name;
+                              cell = tableRow.insertCell(1);
+                              cell.innerHTML = row.student_id;
+                              cell = tableRow.insertCell(2);
+                              cell.innerHTML = row.class_id;
+                              cell = tableRow.insertCell(3);
+                              cell.innerHTML = '<a onClick="onDelete(this)">Delete</a>';
+	                  });
+                      });
+              });
+      }
+      let classID = null;
+
+      function onDelete(td) {
+          let selectedRow = td.parentElement.parentElement;
+          selectedRow.parentNode.removeChild(selectedRow);
+      }
+
+      function onAddStudent() {
+          let student_id = document.getElementById("studentID").value;
+          fetch('/admin/get/student', {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'student_id': student_id
+              }
+          })
+	      .then(res => res.json())
+	      .then(data => {
+                  if (data.length < 1) {
+                      document.getElementById('updateStatus').innerHTML = 'Student not found';
+                  }
+                  let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+                  data.forEach(row => {
+                      let tableRow = table.insertRow(table.length);
+                      let cell = tableRow.insertCell(0);
+                      cell.innerHTML = row.last_name + ' ' + row.first_name;
+                      cell = tableRow.insertCell(1);
+                      cell.innerHTML = student_id;
+                      cell = tableRow.insertCell(2);
+                      cell.innerHTML = row.class_id;
+                      cell = tableRow.insertCell(3);
+                      cell.innerHTML = '<a onClick="onDelete(this)">Delete</a>';
+                  });
+              });
+      }
+
+      function updateList() {
+          let table = document.getElementById("stdlist").getElementsByTagName('tbody')[0];
+          let data = [];
+          for (let i = 0, row; row = table.rows[i]; i += 1) {
+              data.push(row.cells[1].innerHTML);
+          }
+          fetch('/admin/update/semester-class', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'class_id': classID
+              },
+              body: JSON.stringify(data)
+          })
+	      .then(res => res.text())
+	      .then(data => {
+                  document.getElementById('updateStatus').innerHTML = data;
+              });
+      }
+    </script>
+  </div>
+  </body>
+</html>
