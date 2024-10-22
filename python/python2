@@ -1,0 +1,239 @@
+from ortools.sat.python import cp_model
+model=cp_model.CpModel()
+from datetime import datetime
+start_time = datetime.now()
+mon=[]
+cre=[]
+crehp=[]
+stdscore=[]
+comp=[]
+avg=[]
+fac=[]
+diempre=0
+chu=["A+","A","B+","B","C+","C","D+","D","F"]
+so=[8,8,7,6,5,4,3,2,0]
+d={"A+":8,"A":8,"B+":7,"B":6,"C+":5,"C":4,"D+":3,"D":2,"F":0}
+montuchon=['CH2021','ED3220','ED3280','EM1010','EM1180','ET3262','IT2030','ME3123', 'ME3124','TEX3123']
+f = open("D:/dai hoc/thesis/finish 7/python/datapy",'r')
+for line in f:
+    if (len(line.split())==7):
+        if (line.split()[4]!='0'):
+            mon.append(line.split()[0])
+            cre.append(line.split()[1])
+            crehp.append(line.split()[2])
+            stdscore.append(line.split()[3])
+            comp.append(line.split()[4])
+            fac.append(line.split()[5])
+            avg.append(line.split()[6])
+        else:
+            diempre=line.split()[0]
+    elif(len(line.split())==5):
+        if (line.split()[4]!='0'):
+            mon.append(line.split()[0])
+            cre.append(line.split()[1])
+            crehp.append(line.split()[2])
+            stdscore.append(line.split()[3])
+            comp.append(line.split()[4])
+            avg.append('C')
+            fac.append('TCK')
+        else:
+            diempre=line.split()[0]
+    elif(len(line.split())==6):
+        if (line.split()[4]!='0'):
+            mon.append(line.split()[0])
+            cre.append(line.split()[1])
+            crehp.append(line.split()[2])
+            stdscore.append(line.split()[3])
+            comp.append(line.split()[4])
+            avg.append(line.split()[5])
+            fac.append('THKHSS')
+        else:
+            diempre=line.split()[0]
+f.close()
+diempre=int(eval(diempre)*100)
+x=[[] for i in range(0,len(mon))]
+y=[[] for i in range(0,len(mon))]
+z=[[] for i in range(0,len(mon))]
+
+for i in range(0,len(mon)):
+    #globals()['%s' % mon[i]] = model.new_int_var(0, 1, mon[i])
+    x[i]=model.NewIntVar(0, 1, '%sx' % mon[i])
+    y[i]=model.NewIntVarFromDomain(cp_model.Domain.FromValues([0, 2, 3, 4, 5, 6, 7, 8]), '%sy' % mon[i])
+    z[i]=model.NewIntVarFromDomain(cp_model.Domain.FromValues([0, 2, 3, 4, 5, 6, 7, 8]), '%sz' % mon[i])
+    model.AddMultiplicationEquality(z[i], [x[i], y[i]])
+    
+    if (comp[i]=='true' and stdscore[i]=='undefined' and cre[i]!='0'):
+        model.Add(x[i]==1)
+    if (stdscore[i]!='undefined'):
+        model.Add(x[i]==0)
+    # if (cre[i]!='0'):
+    #     model.Add(x[i]==0)
+    if (so[chu.index(avg[i])]+2<=8):
+        model.Add(y[i]<=so[chu.index(avg[i])-2])
+    elif (so[chu.index(avg[i])]+2>8 and so[chu.index(avg[i])]+1<=8):
+        model.Add(y[i]<=so[chu.index(avg[i])-1])
+    elif (so[chu.index(avg[i])]+1>8):
+        model.Add(y[i]<=so[chu.index(avg[i])])
+    model.Add(x[i]+2*z[i]-y[i]!=1)
+demelec=0
+for i in range(0,len(mon)):
+    if ((stdscore[i]!='undefined') and (mon[i] in montuchon)):
+        demelec+=1
+model.Add(sum(x[i] for i in range(0, len(mon))
+                         if (mon[i] in montuchon))>=3-demelec)
+# model.Add(sum(x[i] for i in range(0, len(mon))
+#                          if (mon[i] in montuchon))>=3)
+model.Add(sum(x[i] for i in range(0, len(mon))
+                          if ((mon[i] not in montuchon) and (cre[i] =='0')))==0)
+
+cre = [eval(i) for i in cre]
+
+#Tong mon co x=1 + tong mon ban dau - so hp*du doan/ tong hp bb +tonghp co diem
+
+model.Add(((sum(z[i]*cre[i] for i in range(0, len(mon)))
+                                         +sum(d[stdscore[i]]*cre[i] for i in range(0, len(mon)) if (stdscore[i]!='undefined' and ((mon[i] in montuchon) or (comp[i]=='true'))) ))*100
+                                         -(sum(cre[i]*x[i] for i in range(0, len(mon)) )
+                                             +sum(cre[i] for i in range(0, len(mon)) if (((mon[i] in montuchon) or (comp[i]=='true')) and (stdscore[i]!='undefined'))))*diempre*2)>=0)
+
+model.Add(((sum(z[i]*cre[i] for i in range(0, len(mon)))
+                                         +sum(d[stdscore[i]]*cre[i] for i in range(0, len(mon)) if (stdscore[i]!='undefined' and ((mon[i] in montuchon) or (comp[i]=='true'))) ))*100
+                                         -(sum(cre[i]*x[i] for i in range(0, len(mon)) )
+                                             +sum(cre[i] for i in range(0, len(mon)) if (((mon[i] in montuchon) or (comp[i]=='true')) and (stdscore[i]!='undefined'))))*(diempre+20)*2)<=0)
+
+model.Minimize(((sum(z[i]*cre[i] for i in range(0, len(mon)))
+                                          +sum(d[stdscore[i]]*cre[i] for i in range(0, len(mon)) if (stdscore[i]!='undefined' and ((mon[i] in montuchon) or (comp[i]=='true')))))*100
+                                          -(sum(cre[i]*x[i] for i in range(0, len(mon)) )
+                                              +sum(cre[i] for i in range(0, len(mon)) if (((mon[i] in montuchon) or (comp[i]=='true')) and (stdscore[i]!='undefined'))))*diempre*2)*1 + sum(x[i] for i in range(0, len(mon)))*9)
+
+solver = cp_model.CpSolver()
+status=solver.Solve(model)
+# for i in range(0, len(mon)):
+#     print(solver.Value(x[i]),solver.Value(y[i]),solver.Value(z[i]))
+#print(f"Maximum of objective function: {solver.ObjectiveValue()}\n")
+print(solver.StatusName())
+if (solver.StatusName() !='INFEASIBLE'):
+    g= open("D:/dai hoc/thesis/finish 7/python/result",'w+')
+    for i in range(0, len(mon)):
+        if (chu[so.index(solver.Value(y[i]))] !='A+'):
+            g.write(''+ mon[i]+ ' ' + str(solver.Value(x[i])) +' '+chu[so.index(solver.Value(y[i]))]+'\n');
+        else:
+            g.write(''+ mon[i]+ ' ' + str(solver.Value(x[i])) +' '+'A'+'\n');
+    g.close()
+else:
+    model=cp_model.CpModel()
+    from datetime import datetime
+    start_time = datetime.now()
+    mon=[]
+    cre=[]
+    crehp=[]
+    stdscore=[]
+    comp=[]
+    avg=[]
+    fac=[]
+    diempre=0
+    chu=["A+","A","B+","B","C+","C","D+","D","F"]
+    so=[8,8,7,6,5,4,3,2,0]
+    d={"A+":8,"A":8,"B+":7,"B":6,"C+":5,"C":4,"D+":3,"D":2,"F":0}
+    montuchon=['CH2021','ED3220','ED3280','EM1010','EM1180','ET3262','IT2030','ME3123', 'ME3124','TEX3123']
+    f = open("D:/dai hoc/thesis/finish 7/python/datapy",'r')
+    for line in f:
+        if (len(line.split())==7):
+            if (line.split()[4]!='0'):
+                mon.append(line.split()[0])
+                cre.append(line.split()[1])
+                crehp.append(line.split()[2])
+                stdscore.append(line.split()[3])
+                comp.append(line.split()[4])
+                fac.append(line.split()[5])
+                avg.append(line.split()[6])
+            else:
+                diempre=line.split()[0]
+        elif(len(line.split())==5):
+            if (line.split()[4]!='0'):
+                mon.append(line.split()[0])
+                cre.append(line.split()[1])
+                crehp.append(line.split()[2])
+                stdscore.append(line.split()[3])
+                comp.append(line.split()[4])
+                avg.append('C')
+                fac.append('TCK')
+            else:
+                diempre=line.split()[0]
+        elif(len(line.split())==6):
+            if (line.split()[4]!='0'):
+                mon.append(line.split()[0])
+                cre.append(line.split()[1])
+                crehp.append(line.split()[2])
+                stdscore.append(line.split()[3])
+                comp.append(line.split()[4])
+                avg.append(line.split()[5])
+                fac.append('THKHSS')
+            else:
+                diempre=line.split()[0]
+    f.close()
+    diempre=int(eval(diempre)*100)
+    x=[[] for i in range(0,len(mon))]
+    y=[[] for i in range(0,len(mon))]
+    z=[[] for i in range(0,len(mon))]
+
+    for i in range(0,len(mon)):
+        #globals()['%s' % mon[i]] = model.new_int_var(0, 1, mon[i])
+        x[i]=model.NewIntVar(0, 1, '%sx' % mon[i])
+        y[i]=model.NewIntVarFromDomain(cp_model.Domain.FromValues([0, 2, 3, 4, 5, 6, 7, 8]), '%sy' % mon[i])
+        z[i]=model.NewIntVarFromDomain(cp_model.Domain.FromValues([0, 2, 3, 4, 5, 6, 7, 8]), '%sz' % mon[i])
+        model.AddMultiplicationEquality(z[i], [x[i], y[i]])
+        
+        if (comp[i]=='true' and stdscore[i]=='undefined' and cre[i]!='0'):
+            model.Add(x[i]==1)
+        if (stdscore[i]!='undefined'):
+            model.Add(x[i]==0)
+        model.Add(x[i]+2*z[i]-y[i]!=1)
+
+    model.Add(sum(x[i] for i in range(0, len(mon))
+                            if (mon[i] in montuchon))>=3)
+    model.Add(sum(x[i] for i in range(0, len(mon))
+                            if ((mon[i] not in montuchon) and (cre[i] =='0')))==0)
+
+    cre = [eval(i) for i in cre]
+
+    #Tong mon co x=1 + tong mon ban dau - so hp*du doan/ tong hp bb +tonghp co diem
+
+    model.Add(((sum(z[i]*cre[i] for i in range(0, len(mon)))
+                                            +sum(d[stdscore[i]]*cre[i] for i in range(0, len(mon)) if (stdscore[i]!='undefined' and ((mon[i] in montuchon) or (comp[i]=='true'))) ))*100
+                                            -(sum(cre[i]*x[i] for i in range(0, len(mon)) )
+                                                +sum(cre[i] for i in range(0, len(mon)) if (((mon[i] in montuchon) or (comp[i]=='true')) and (stdscore[i]!='undefined'))))*diempre*2)>=0)
+
+    model.Add(((sum(z[i]*cre[i] for i in range(0, len(mon)))
+                                         +sum(d[stdscore[i]]*cre[i] for i in range(0, len(mon)) if (stdscore[i]!='undefined' and ((mon[i] in montuchon) or (comp[i]=='true'))) ))*100
+                                         -(sum(cre[i]*x[i] for i in range(0, len(mon)) )
+                                             +sum(cre[i] for i in range(0, len(mon)) if (((mon[i] in montuchon) or (comp[i]=='true')) and (stdscore[i]!='undefined'))))*(diempre+20)*2)<=0)
+
+    model.Minimize(((sum(z[i]*cre[i] for i in range(0, len(mon)))
+                                            +sum(d[stdscore[i]]*cre[i] for i in range(0, len(mon)) if (stdscore[i]!='undefined' and ((mon[i] in montuchon) or (comp[i]=='true')))))*100
+                                            -(sum(cre[i]*x[i] for i in range(0, len(mon)) )
+                                                +sum(cre[i] for i in range(0, len(mon)) if (((mon[i] in montuchon) or (comp[i]=='true')) and (stdscore[i]!='undefined'))))*diempre*2)*1 + sum(x[i] for i in range(0, len(mon)))*9)
+
+    solver = cp_model.CpSolver()
+    status=solver.Solve(model)
+    # for i in range(0, len(mon)):
+    #     print(solver.Value(x[i]),solver.Value(y[i]),solver.Value(z[i]))
+    #print(f"Maximum of objective function: {solver.ObjectiveValue()}\n")
+    print(solver.StatusName())
+    g= open("D:/dai hoc/thesis/finish 7/python/result",'w+')
+    for i in range(0, len(mon)):
+        if (chu[so.index(solver.Value(y[i]))] !='A+'):
+            g.write(''+ mon[i]+ ' ' + str(solver.Value(x[i])) +' '+chu[so.index(solver.Value(y[i]))]+'\n');
+        else:
+            g.write(''+ mon[i]+ ' ' + str(solver.Value(x[i])) +' '+'A'+'\n');
+    g.close()
+a=0
+b=0
+for i in range(0, len(mon)):
+    a+=solver.Value(z[i])*cre[i]
+    b+=solver.Value(x[i])*cre[i]
+    if (stdscore[i]!='undefined' and ((mon[i] in montuchon) or (comp[i]=='true'))):
+        a+=d[stdscore[i]]*cre[i]
+        b+=cre[i]
+print(a*100)
+print(b*diempre*2)
+print(a/b)
